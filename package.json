@@ -1,0 +1,29 @@
+{
+  "name": "sconnect-pro",
+  "version": "1.0.0",
+  "description": "Plateforme de gestion sportive et associative.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/makhfi03/Sconnect-Pro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/makhfi03/Sconnect-Pro/issues"
+  },
+  "homepage": "https://github.com/makhfi03/Sconnect-Pro#readme",
+  "dependencies": {
+    "dotenv": "^18.0.0",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
