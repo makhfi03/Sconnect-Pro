@@ -46,12 +46,19 @@ router.get('/api/health', async (req, res) => {
 });
 
 router.get('/api/stats', HomeController.getStats);
+
 router.get('/api/facilities', FacilityController.getAll);
 router.post('/api/facilities', FacilityController.create);
+
 router.get('/api/activities', ActivityController.getAll);
 router.get('/api/activities/:id', ActivityController.getById);
 router.post('/api/activities', ActivityController.create);
+
 router.get('/api/members', MemberController.getAll);
+router.get('/api/members/:id', MemberController.getById);
+router.post('/api/members', MemberController.create);
+router.put('/api/members/:id', MemberController.update);
+
 router.post('/api/registrations', RegistrationController.create);
 
 const server = http.createServer(async (req, res) => {
