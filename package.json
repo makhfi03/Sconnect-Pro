@@ -21,8 +21,13 @@
   },
   "homepage": "https://github.com/makhfi03/Sconnect-Pro#readme",
   "dependencies": {
+    "body-parser": "^2.3.0",
     "dotenv": "^18.0.0",
-    "pg": "^8.23.0"
+    "ejs": "^6.0.1",
+    "finalhandler": "^2.1.1",
+    "find-my-way": "^9.9.0",
+    "pg": "^8.23.0",
+    "serve-static": "^2.2.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

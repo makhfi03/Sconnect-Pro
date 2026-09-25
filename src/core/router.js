@@ -1,31 +1,48 @@
+import findMyWay from 'find-my-way';
+
 export class Router {
-  constructor() {
-    this.routes = [];
+  constructor(options = {}) {
+    this.router = findMyWay({
+      defaultRoute: options.defaultRoute || ((req, res) => {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Route non trouvée' }));
+      })
+    });
   }
 
-  addRoute(method, path, handler) {
-    this.routes.push({ method, path, handler });
+  get(path, handler) {
+    this.router.on('GET', path, (req, res, params) => {
+      req.params = params;
+      return handler(req, res);
+    });
   }
 
-  get(path, handler) { this.addRoute('GET', path, handler); }
-  post(path, handler) { this.addRoute('POST', path, handler); }
-  put(path, handler) { this.addRoute('PUT', path, handler); }
-  delete(path, handler) { this.addRoute('DELETE', path, handler); }
+  post(path, handler) {
+    this.router.on('POST', path, (req, res, params) => {
+      req.params = params;
+      return handler(req, res);
+    });
+  }
 
-  async handle(req, res) {
+  put(path, handler) {
+    this.router.on('PUT', path, (req, res, params) => {
+      req.params = params;
+      return handler(req, res);
+    });
+  }
+
+  delete(path, handler) {
+    this.router.on('DELETE', path, (req, res, params) => {
+      req.params = params;
+      return handler(req, res);
+    });
+  }
+
+  lookup(req, res) {
     const baseURL = `http://${req.headers.host || 'localhost'}`;
     const parsedUrl = new URL(req.url, baseURL);
-    const pathname = parsedUrl.pathname;
-    const method = req.method;
-
-    const route = this.routes.find(r => r.method === method && r.path === pathname);
-
-    if (route) {
-      req.query = Object.fromEntries(parsedUrl.searchParams.entries());
-      await route.handler(req, res);
-    } else {
-      res.writeHead(404, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Route non trouvée' }));
-    }
+    req.query = Object.fromEntries(parsedUrl.searchParams.entries());
+    req.pathname = parsedUrl.pathname;
+    this.router.lookup(req, res);
   }
 }
