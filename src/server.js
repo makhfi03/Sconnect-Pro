@@ -13,6 +13,7 @@ import { FacilityController } from './controllers/facilityController.js';
 import { ActivityController } from './controllers/activityController.js';
 import { MemberController } from './controllers/memberController.js';
 import { RegistrationController } from './controllers/registrationController.js';
+import { WaitingListService } from './services/waitingListService.js';
 
 dotenv.config();
 
@@ -62,6 +63,43 @@ router.put('/api/members/:id', MemberController.update);
 router.post('/api/registrations/quote', RegistrationController.quote);
 router.post('/api/registrations', RegistrationController.create);
 router.post('/api/registrations/:id/cancel', RegistrationController.cancel);
+
+router.get('/api/activities/:id/waiting-list', async (req, res) => {
+  try {
+    const list = await WaitingListService.getWaitingListForActivity(req.params.id);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(list));
+  } catch (error) {
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Erreur lors de la récupération de la file d\'attente' }));
+  }
+});
+
+router.post('/api/waiting-list/:id/confirm', async (req, res) => {
+  try {
+    const result = await WaitingListService.confirmPromotion(req.params.id);
+    if (!result.success) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: result.reason }));
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'CONFIRMED', finalPrice: result.finalPrice }));
+  } catch (error) {
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Erreur lors de la confirmation', details: error.message }));
+  }
+});
+
+router.post('/api/waiting-list/expire', async (req, res) => {
+  try {
+    const results = await WaitingListService.expireOverduePromotions();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ processed: results.length, details: results }));
+  } catch (error) {
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Erreur lors du traitement des expirations', details: error.message }));
+  }
+});
 
 const server = http.createServer(async (req, res) => {
   try {
