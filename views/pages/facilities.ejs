@@ -1,0 +1,60 @@
+<%- include('../partials/header', { title: 'Infrastructures Sportives' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="container">
+  <%- include('../partials/alerts') %>
+
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 class="page-title">Infrastructures Municipales</h1>
+      <p class="page-subtitle">Gestion du parc d'équipements sportifs et respect des jauges ERP</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Liste des Équipements</h2>
+    </div>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Nom de l'Infrastructure</th>
+            <th>Sous-Zone</th>
+            <th>Jauge Sécurité ERP</th>
+            <th>Statut Concurrence</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (facilities && facilities.length > 0) { %>
+            <% for (let i = 0; i < facilities.length; i++) { %>
+              <% const f = facilities[i]; %>
+              <tr>
+                <td><strong><%= f.name %></strong></td>
+                <td>
+                  <% if (f.sub_zone) { %>
+                    <span style="background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;"><%= f.sub_zone %></span>
+                  <% } else { %>
+                    <span style="color: var(--text-muted); font-size: 0.8rem;">Terrain complet</span>
+                  <% } %>
+                </td>
+                <td><strong><%= f.capacity %></strong> personnes max</td>
+                <td>
+                  <span class="badge badge-success">
+                    <span class="badge-dot"></span> Conforme ERP
+                  </span>
+                </td>
+              </tr>
+            <% } %>
+          <% } else { %>
+            <tr>
+              <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">Aucune infrastructure enregistrée.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

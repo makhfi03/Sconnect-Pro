@@ -1,0 +1,94 @@
+<%- include('../partials/header', { title: 'Nouvel Adhérent' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="container" style="max-width: 800px;">
+  <%- include('../partials/alerts') %>
+
+  <div class="page-header">
+    <a href="/members" style="display: inline-flex; align-items: center; gap: 0.35rem; color: var(--primary); font-size: 0.875rem; text-decoration: none; font-weight: 700; margin-bottom: 0.75rem;">
+      ← Retour au registre des adhérents
+    </a>
+    <h1 class="page-title">Créer une Fiche Adhérent</h1>
+    <p class="page-subtitle">Renseignez les données personnelles, familiales et médicales de l'usager</p>
+  </div>
+
+  <div class="card card-body">
+    <form action="/members/new" method="POST">
+      
+      <div class="form-section">
+        <div class="form-section-title">
+          <span>👤</span> Identité & État Civil
+        </div>
+        <div class="form-section-desc">Nom, prénom et date de naissance pour le calcul de l'âge fédéral</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstname">Prénom *</label>
+            <input type="text" id="firstname" name="firstname" placeholder="Ex: Lucas" required>
+          </div>
+
+          <div class="form-group">
+            <label for="lastname">Nom de famille *</label>
+            <input type="text" id="lastname" name="lastname" placeholder="Ex: Dupont" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="birth_date">Date de naissance *</label>
+            <input type="date" id="birth_date" name="birth_date" required>
+          </div>
+
+          <div class="form-group">
+            <label for="family_id">Foyer Fiscal (Famille)</label>
+            <select id="family_id" name="family_id">
+              <option value="">-- Sans foyer fiscal (Individuel) --</option>
+              <% if (families && families.length > 0) { %>
+                <% for (let i = 0; i < families.length; i++) { %>
+                  <option value="<%= families[i].id %>">
+                    <%= families[i].family_code %> (Quotient Familial : <%= parseFloat(families[i].quotient_familial).toFixed(2) %> €)
+                  </option>
+                <% } %>
+              <% } %>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">
+          <span>📋</span> Résidence & Subventions
+        </div>
+        <div class="form-section-desc">Critères conditionnant la tarification et les bourses</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="is_resident">Statut de Résidence *</label>
+            <select id="is_resident" name="is_resident" required>
+              <option value="true">Résident communal (Tarif subventionné plein)</option>
+              <option value="false">Non-résident / Extérieur (Majoration +35%)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="passport_code">Code Pass'Sport (Optionnel)</label>
+            <input type="text" id="passport_code" name="passport_code" placeholder="Ex: PASS-2026-99">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cert_medical_date">Date du Certificat Médical *</label>
+          <input type="date" id="cert_medical_date" name="cert_medical_date" required>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; align-items: center; gap: 1rem; margin-top: 2rem;">
+        <a href="/members" class="btn btn-secondary">Annuler</a>
+        <button type="submit" class="btn btn-primary" style="padding: 0.85rem 2rem;">Enregistrer l'adhérent</button>
+      </div>
+
+    </form>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

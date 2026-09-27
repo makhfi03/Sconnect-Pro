@@ -1,0 +1,70 @@
+<%- include('../partials/header', { title: 'Catalogue des Activités' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="container">
+  <%- include('../partials/alerts') %>
+
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 class="page-title">Catalogue des Activités</h1>
+      <p class="page-subtitle">Créneaux d'entraînement, clubs partenaires et disponibilités</p>
+    </div>
+    <div>
+      <a href="/activities/new" class="btn btn-primary">+ Planifier un cours</a>
+    </div>
+  </div>
+
+  <div class="stats-grid" style="grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));">
+    <% if (activities && activities.length > 0) { %>
+      <% for (let i = 0; i < activities.length; i++) { %>
+        <% const act = activities[i]; %>
+        <% const remaining = parseInt(act.remaining_seats) || 0; %>
+        <% const isFull = remaining <= 0; %>
+        <% const days = ['', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']; %>
+        <div class="stat-card" style="position: relative;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+              <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main);"><%= act.title %></h3>
+              <% if (act.is_high_risk_sport) { %>
+                <span class="badge badge-warning" style="font-size: 0.7rem;">Sport à risque</span>
+              <% } %>
+            </div>
+            
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+              🏛️ <%= act.facility_name %> <br>
+              🤝 <%= act.association_name || 'Club Municipal' %>
+            </p>
+
+            <div style="background: #f8fafc; padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1rem; font-size: 0.85rem;">
+              <div>🗓️ <strong><%= days[act.day_of_week] || 'Jour ' + act.day_of_week %></strong> de <%= act.start_time.slice(0, 5) %> à <%= act.end_time.slice(0, 5) %></div>
+              <div style="margin-top: 0.25rem;">🎂 Tranche d'âge : <%= act.min_age %> - <%= act.max_age %> ans</div>
+              <div style="margin-top: 0.25rem;">💶 Tarif de base : <strong><%= parseFloat(act.base_price).toFixed(2) %> €</strong> / an</div>
+            </div>
+
+            <div style="margin-bottom: 1.25rem;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.25rem;">
+                <span>Disponibilité</span>
+                <span><%= isFull ? 'Complet (File d\'attente)' : remaining + ' places restantes' %></span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill <%= isFull ? 'fill-danger' : 'fill-success' %>" style="width: <%= isFull ? 100 : Math.round(((act.max_capacity - remaining) / act.max_capacity) * 100) %>%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem;">
+            <a href="/checkout?activity_id=<%= act.id %>" class="btn <%= isFull ? 'btn-primary' : 'btn-primary' %>" style="width: 100%; justify-content: center;">
+              <%= isFull ? 'Rejoindre la file d\'attente' : 'Inscrire un adhérent' %>
+            </a>
+          </div>
+        </div>
+      <% } %>
+    <% } else { %>
+      <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
+        Aucune activité enregistrée. Cliquez sur "+ Planifier un cours" pour en ajouter une.
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

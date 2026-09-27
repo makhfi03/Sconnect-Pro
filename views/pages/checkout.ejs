@@ -1,0 +1,105 @@
+<%- include('../partials/header', { title: 'Inscription & Devis' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="container" style="max-width: 850px;">
+  <%- include('../partials/alerts') %>
+
+  <div class="page-header">
+    <a href="/activities" style="display: inline-flex; align-items: center; gap: 0.35rem; color: var(--primary); font-size: 0.875rem; text-decoration: none; font-weight: 700; margin-bottom: 0.75rem;">
+      ← Retour au catalogue
+    </a>
+    <h1 class="page-title">Tunnel d'Inscription & Devis Transparent</h1>
+    <p class="page-subtitle">Calcul instantané des droits tarifaires, déductions sociales et échéancier</p>
+  </div>
+
+  <div class="card card-body" style="margin-bottom: 2rem;">
+    <form action="/checkout/preview" method="POST" style="margin-bottom: 2rem;">
+      <div class="form-section">
+        <div class="form-section-title"><span>🎯</span> Sélection de l'Adhérent et de l'Activité</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="member_id">Adhérent bénéficiaire *</label>
+            <select id="member_id" name="member_id" required>
+              <option value="">-- Choisir un usager --</option>
+              <% if (members && members.length > 0) { %>
+                <% for (let i = 0; i < members.length; i++) { %>
+                  <option value="<%= members[i].id %>" <%= selectedMemberId == members[i].id ? 'selected' : '' %>>
+                    <%= members[i].firstname %> <%= members[i].lastname %> (<%= members[i].is_resident ? 'Résident' : 'Extérieur' %>)
+                  </option>
+                <% } %>
+              <% } %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="activity_id">Activité choisie *</label>
+            <select id="activity_id" name="activity_id" required>
+              <option value="">-- Choisir un cours --</option>
+              <% if (activities && activities.length > 0) { %>
+                <% for (let i = 0; i < activities.length; i++) { %>
+                  <option value="<%= activities[i].id %>" <%= selectedActivityId == activities[i].id ? 'selected' : '' %>>
+                    <%= activities[i].title %> • <%= parseFloat(activities[i].base_price).toFixed(2) %> €
+                  </option>
+                <% } %>
+              <% } %>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end;">
+          <button type="submit" class="btn btn-primary">Calculer le devis personnalisé</button>
+        </div>
+      </div>
+    </form>
+
+    <% if (typeof quoteData !== 'undefined' && quoteData) { %>
+      <div class="form-section" style="background: #f8fafc; padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+        <div class="form-section-title" style="color: var(--primary);"><span>🧾</span> Décomposition du Tarif Final</div>
+        <div class="form-section-desc">Devis calculé selon la grille tarifaire métropolitaine</div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-subtle);">
+            <span>Tarif de base de l'activité :</span>
+            <strong><%= parseFloat(quoteData.quote.basePrice).toFixed(2) %> €</strong>
+          </div>
+
+          <% if (quoteData.quote.discounts && quoteData.quote.discounts.length > 0) { %>
+            <% for (let d = 0; d < quoteData.quote.discounts.length; d++) { %>
+              <% const item = quoteData.quote.discounts[d]; %>
+              <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-subtle); color: <%= item.amount < 0 ? 'var(--success)' : 'var(--danger)' %>;">
+                <span><%= item.label %> :</span>
+                <strong><%= item.amount > 0 ? '+' : '' %><%= parseFloat(item.amount).toFixed(2) %> €</strong>
+              </div>
+            <% } %>
+          <% } %>
+
+          <div style="display: flex; justify-content: space-between; padding: 1rem 0 0.5rem 0; font-size: 1.25rem; font-weight: 800; color: var(--text-main);">
+            <span>Montant total à régler :</span>
+            <span style="color: var(--primary);"><%= parseFloat(quoteData.quote.finalPrice).toFixed(2) %> €</span>
+          </div>
+        </div>
+
+        <form action="/checkout/confirm" method="POST">
+          <input type="hidden" name="member_id" value="<%= selectedMemberId %>">
+          <input type="hidden" name="activity_id" value="<%= selectedActivityId %>">
+
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="installments">Option de règlement :</label>
+            <select id="installments" name="installments" style="background: white;">
+              <option value="1">Paiement comptant en 1 fois (<%= parseFloat(quoteData.quote.finalPrice).toFixed(2) %> €)</option>
+              <option value="3">Paiement échelonné en 3 fois sans frais (40% / 30% / 30%)</option>
+            </select>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+            <button type="submit" class="btn btn-primary" style="padding: 0.85rem 2rem; background-color: var(--success);">
+              Confirmer l'inscription (Transaction ACID)
+            </button>
+          </div>
+        </form>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

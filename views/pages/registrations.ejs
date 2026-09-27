@@ -1,0 +1,124 @@
+<%- include('../partials/header', { title: 'Suivi des Inscriptions' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="container">
+  <%- include('../partials/alerts') %>
+
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 class="page-title">Gestion des Inscriptions & Files d'Attente</h1>
+      <p class="page-subtitle">Suivi des places confirmées, gestion des annulations et repêchages sous 48h</p>
+    </div>
+    <div>
+      <form action="/waiting-list/expire-check" method="POST" style="display: inline;">
+        <button type="submit" class="btn btn-secondary">🔄 Actualiser les délais 48h</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+      <h2 class="card-title">Inscriptions Confirmées</h2>
+    </div>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Adhérent</th>
+            <th>Activité</th>
+            <th>Tarif Payé</th>
+            <th>Date d'inscription</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (registrations && registrations.length > 0) { %>
+            <% for (let i = 0; i < registrations.length; i++) { %>
+              <% const r = registrations[i]; %>
+              <tr>
+                <td><strong><%= r.firstname %> <%= r.lastname %></strong></td>
+                <td><%= r.activity_title %></td>
+                <td><strong style="color: var(--primary);"><%= parseFloat(r.final_price).toFixed(2) %> €</strong></td>
+                <td><%= new Date(r.created_at).toLocaleDateString('fr-FR') %></td>
+                <td>
+                  <form action="/registrations/<%= r.id %>/cancel" method="POST" onsubmit="return confirm('Annuler cette inscription ? Le premier candidat de la file d\'attente sera automatiquement promu.');">
+                    <button type="submit" class="btn" style="background: var(--danger-light); color: var(--danger); padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                      Annuler la place
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% } %>
+          <% } else { %>
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Aucune inscription active.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Candidats en File d'Attente Prioritaire</h2>
+    </div>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Candidat</th>
+            <th>Activité</th>
+            <th>Score Priorité</th>
+            <th>Statut</th>
+            <th>Délai de Confirmation</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (waitingList && waitingList.length > 0) { %>
+            <% for (let w = 0; w < waitingList.length; w++) { %>
+              <% const item = waitingList[w]; %>
+              <tr>
+                <td><strong><%= item.firstname %> <%= item.lastname %></strong></td>
+                <td><%= item.activity_title %></td>
+                <td><span class="badge" style="background: #eef2ff; color: var(--primary);">Score : <%= item.score %> pts</span></td>
+                <td>
+                  <% if (item.status === 'promoted_pending') { %>
+                    <span class="badge badge-warning"><span class="badge-dot"></span> Place Libérée (Repêchage)</span>
+                  <% } else { %>
+                    <span class="badge" style="background: #f1f5f9; color: var(--text-muted);">En attente</span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (item.confirmation_deadline) { %>
+                    <strong style="color: var(--danger);"><%= new Date(item.confirmation_deadline).toLocaleString('fr-FR') %></strong>
+                  <% } else { %>
+                    <span style="color: var(--text-muted);">-</span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (item.status === 'promoted_pending') { %>
+                    <form action="/waiting-list/<%= item.id %>/confirm-ui" method="POST">
+                      <button type="submit" class="btn btn-primary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: var(--success);">
+                        Valider l'entrée
+                      </button>
+                    </form>
+                  <% } else { %>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">En attente de place</span>
+                  <% } %>
+                </td>
+              </tr>
+            <% } %>
+          <% } else { %>
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">Aucun candidat en file d'attente.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

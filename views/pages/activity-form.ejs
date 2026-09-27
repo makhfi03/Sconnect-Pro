@@ -1,0 +1,137 @@
+<%- include('../partials/header', { title: 'Planifier une Activité' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="container" style="max-width: 800px;">
+  <%- include('../partials/alerts') %>
+
+  <div class="page-header">
+    <a href="/activities" style="display: inline-flex; align-items: center; gap: 0.35rem; color: var(--primary); font-size: 0.875rem; text-decoration: none; font-weight: 700; margin-bottom: 0.75rem;">
+      ← Retour au catalogue des activités
+    </a>
+    <h1 class="page-title">Planifier une Nouvelle Activité</h1>
+    <p class="page-subtitle">Configurez le créneau horaire, l'infrastructure associée et les règles d'éligibilité</p>
+  </div>
+
+  <div class="card card-body">
+    <form action="/activities/new" method="POST">
+      
+      <div class="form-section">
+        <div class="form-section-title">
+          <span>📌</span> Informations Générales
+        </div>
+        <div class="form-section-desc">Identité du cours et organisme organisateur</div>
+
+        <div class="form-group">
+          <label for="title">Intitulé de l'activité *</label>
+          <input type="text" id="title" name="title" placeholder="Ex: Judo Poussin, Natation Adultes, Boxe Française..." required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="facility_id">Infrastructure & Salle *</label>
+            <select id="facility_id" name="facility_id" required>
+              <option value="">-- Choisir une infrastructure --</option>
+              <% if (facilities && facilities.length > 0) { %>
+                <% for (let i = 0; i < facilities.length; i++) { %>
+                  <option value="<%= facilities[i].id %>">
+                    <%= facilities[i].name %> <%= facilities[i].sub_zone ? '• ' + facilities[i].sub_zone : '' %> (Jauge max : <%= facilities[i].capacity %>)
+                  </option>
+                <% } %>
+              <% } %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="association_id">Club Partenaire *</label>
+            <select id="association_id" name="association_id" required>
+              <option value="1">Club de Judo Municipal</option>
+              <option value="2">Association Aquatique Métropolitaine</option>
+              <option value="3">Basket-Ball Club 93</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">
+          <span>💶</span> Tarification & Jauges
+        </div>
+        <div class="form-section-desc">Montant annuel de base et capacité d'accueil autorisée</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="base_price">Tarif de base annuel (€) *</label>
+            <input type="number" id="base_price" name="base_price" step="0.01" min="0" placeholder="150.00" required>
+          </div>
+
+          <div class="form-group">
+            <label for="max_capacity">Capacité max du cours *</label>
+            <input type="number" id="max_capacity" name="max_capacity" min="1" placeholder="Ex: 20 participants" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">
+          <span>🗓️</span> Créneau Horaire & Conditions
+        </div>
+        <div class="form-section-desc">Horaire hebdomadaire et restrictions d'âge fédérales</div>
+
+        <div class="form-row" style="grid-template-columns: 1.2fr 1fr 1fr;">
+          <div class="form-group">
+            <label for="day_of_week">Jour hebdomadaire *</label>
+            <select id="day_of_week" name="day_of_week" required>
+              <option value="1">Lundi</option>
+              <option value="2">Mardi</option>
+              <option value="3">Mercredi</option>
+              <option value="4">Jeudi</option>
+              <option value="5">Vendredi</option>
+              <option value="6">Samedi</option>
+              <option value="7">Dimanche</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="start_time">Début du cours *</label>
+            <input type="time" id="start_time" name="start_time" required>
+          </div>
+
+          <div class="form-group">
+            <label for="end_time">Fin du cours *</label>
+            <input type="time" id="end_time" name="end_time" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="min_age">Âge minimum requis</label>
+            <input type="number" id="min_age" name="min_age" min="0" max="99" value="6">
+          </div>
+
+          <div class="form-group">
+            <label for="max_age">Âge maximum admis</label>
+            <input type="number" id="max_age" name="max_age" min="0" max="99" value="99">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1rem;">
+          <label class="checkbox-card">
+            <input type="checkbox" name="is_high_risk_sport" value="true">
+            <div>
+              <div class="checkbox-title">Discipline à contraintes particulières (Sport à risque)</div>
+              <div class="checkbox-desc">Exige un certificat médical de moins d'1 an obligatoire (Boxe, Plongée sous-marine, Rugby, Sports de combat intenses).</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; align-items: center; gap: 1rem; margin-top: 2rem;">
+        <a href="/activities" class="btn btn-secondary">Annuler</a>
+        <button type="submit" class="btn btn-primary" style="padding: 0.85rem 2rem;">Créer l'activité</button>
+      </div>
+
+    </form>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

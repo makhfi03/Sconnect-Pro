@@ -1,0 +1,96 @@
+<%- include('../partials/header', { title: 'Registre des Adhérents' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="container">
+  <%- include('../partials/alerts') %>
+
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 class="page-title">Registre des Adhérents</h1>
+      <p class="page-subtitle">Gestion des usagers, rattachements familiaux et conformité médicale</p>
+    </div>
+    <div>
+      <a href="/members/new" class="btn btn-primary">+ Nouvel Adhérent</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Adhérents Enregistrés</h2>
+    </div>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Identité</th>
+            <th>Foyer Fiscal</th>
+            <th>Catégorie Fédérale</th>
+            <th>Résidence</th>
+            <th>Certificat Médical</th>
+            <th>Pass'Sport</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (members && members.length > 0) { %>
+            <% for (let i = 0; i < members.length; i++) { %>
+              <% const m = members[i]; %>
+              <tr>
+                <td>
+                  <div style="font-weight: 700; color: var(--text-main);"><%= m.firstname %> <%= m.lastname %></div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">Né(e) le <%= new Date(m.birth_date).toLocaleDateString('fr-FR') %></div>
+                </td>
+                <td>
+                  <% if (m.family_code) { %>
+                    <span style="font-weight: 600;"><%= m.family_code %></span>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">QF : <%= parseFloat(m.quotient_familial).toFixed(2) %> €</div>
+                  <% } else { %>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Individuel</span>
+                  <% } %>
+                </td>
+                <td>
+                  <span class="badge" style="background: #e0e7ff; color: #3730a3;">
+                    <%= m.federal_category %> (<%= m.federal_age %> ans)
+                  </span>
+                </td>
+                <td>
+                  <% if (m.is_resident) { %>
+                    <span class="badge badge-success"><span class="badge-dot"></span> Résident</span>
+                  <% } else { %>
+                    <span class="badge badge-warning"><span class="badge-dot"></span> Extérieur (+35%)</span>
+                  <% } %>
+                </td>
+                <td>
+                  <% 
+                    const certDate = new Date(m.cert_medical_date);
+                    const threeYearsAgo = new Date();
+                    threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
+                    const isCertValid = certDate >= threeYearsAgo;
+                  %>
+                  <span class="badge <%= isCertValid ? 'badge-success' : 'badge-danger' %>">
+                    <span class="badge-dot"></span>
+                    <%= certDate.toLocaleDateString('fr-FR') %>
+                  </span>
+                </td>
+                <td>
+                  <% if (m.passport_code) { %>
+                    <span style="background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600; color: var(--primary);">
+                      <%= m.passport_code %>
+                    </span>
+                  <% } else { %>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Aucun</span>
+                  <% } %>
+                </td>
+              </tr>
+            <% } %>
+          <% } else { %>
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">Aucun adhérent enregistré.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

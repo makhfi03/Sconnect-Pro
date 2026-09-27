@@ -1,0 +1,143 @@
+<%- include('../partials/header', { title: 'Tableau de Bord Métropolitain' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="container">
+  <%- include('../partials/alerts') %>
+
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 class="page-title">Tableau de Bord Métropolitain</h1>
+      <p class="page-subtitle">Supervision en temps réel des infrastructures, inscriptions et finances sportives</p>
+    </div>
+    <div>
+      <span style="display: inline-flex; align-items: center; gap: 0.5rem; background: #ffffff; border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; color: #475569;">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
+        Système Opérationnel
+      </span>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-label">Adhérents Enregistrés</span>
+        <div class="stat-icon" style="background: #eef2ff; color: #4f46e5;">👥</div>
+      </div>
+      <div class="stat-value"><%= overview.total_members %></div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-label">Inscriptions Confirmées</span>
+        <div class="stat-icon" style="background: #ecfdf5; color: #10b981;">✅</div>
+      </div>
+      <div class="stat-value" style="color: #059669;"><%= overview.total_registrations %></div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-label">File d'Attente</span>
+        <div class="stat-icon" style="background: #fffbeb; color: #d97706;">⏳</div>
+      </div>
+      <div class="stat-value" style="color: #d97706;"><%= overview.total_waiting %></div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-label">Recettes Totales</span>
+        <div class="stat-icon" style="background: #f0fdf4; color: #16a34a;">💶</div>
+      </div>
+      <div class="stat-value"><%= parseFloat(overview.total_revenue).toFixed(2) %> <span style="font-size: 1.25rem; font-weight: 600; color: var(--text-muted);">€</span></div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Top Activités & Taux de Remplissage</h2>
+        <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Jauges en direct</span>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Activité</th>
+              <th>Capacité</th>
+              <th>Inscrits</th>
+              <th style="min-width: 160px;">Remplissage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (top_activities && top_activities.length > 0) { %>
+              <% top_activities.forEach(function(act) { %>
+                <% 
+                  const rate = parseFloat(act.fill_rate_percent);
+                  let color = '#10b981';
+                  let badgeClass = 'badge-success';
+                  if (rate >= 100) { color = '#ef4444'; badgeClass = 'badge-danger'; }
+                  else if (rate >= 75) { color = '#f59e0b'; badgeClass = 'badge-warning'; }
+                %>
+                <tr>
+                  <td>
+                    <div style="font-weight: 700; color: var(--text-main);"><%= act.title %></div>
+                  </td>
+                  <td><strong><%= act.max_capacity %></strong> places</td>
+                  <td><%= act.confirmed_count %> usagers</td>
+                  <td>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                      <span class="badge <%= badgeClass %>">
+                        <span class="badge-dot"></span>
+                        <%= act.fill_rate_percent %> %
+                      </span>
+                    </div>
+                    <div class="progress-bar-bg">
+                      <div class="progress-bar-fill" style="width: <%= Math.min(rate, 100) %>%; background: <%= color %>;"></div>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } else { %>
+              <tr>
+                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">Aucune activité enregistrée.</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Recettes par Club</h2>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Club / Activité</th>
+              <th style="text-align: right;">Total perçu</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (revenue_by_activity && revenue_by_activity.length > 0) { %>
+              <% revenue_by_activity.forEach(function(item) { %>
+                <tr>
+                  <td style="font-weight: 600;"><%= item.title %></td>
+                  <td style="text-align: right; font-weight: 700; color: #059669;">
+                    <%= parseFloat(item.revenue).toFixed(2) %> €
+                  </td>
+                </tr>
+              <% }); %>
+            <% } else { %>
+              <tr>
+                <td colspan="2" style="text-align: center; color: var(--text-muted); padding: 2rem;">Aucune recette.</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>
