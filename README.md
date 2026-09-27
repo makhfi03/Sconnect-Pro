@@ -1,6 +1,6 @@
 ﻿# SportConnect Pro
 
-Plateforme de gestion sportive et associative.
+Plateforme de gestion des inscriptions sportives municipales construite en **Node.js natif** (sans framework monolithique) avec **PostgreSQL**.
 
 ## Arborescence du projet
 
@@ -59,3 +59,36 @@ sportconnect-pro/
 |-- package.json
 `-- server.js
 ```
+
+## Architecture
+src/ 
+├── config/db.js # Pool de connexions PostgreSQL 
+├── core/ 
+│ ├── router.js # Routeur Radix Tree (find-my-way) 
+│ ├── bodyParser.js # Parseur HTTP natif (JSON + URL-encoded) 
+│ └── renderer.js # Moteur de rendu EJS 
+├── controllers/ 
+│ ├── homeController.js  
+│ ├── facilityController.js # CRUD infrastructures 
+│ ├── activityController.js # CRUD activités + collision 
+│ ├── memberController.js # CRUD adhérents + catégorie fédérale │ └── registrationController.js # Inscription ACID + devis + annulation 
+├── services/ 
+│ ├── eligibilityService.js # Âge fédéral + certificat médical │ ├── pricingService.js # Tarification multi-critères + échéancier 
+│ ├── scheduleService.js # Collision créneaux + jauge ERP 
+│ └── waitingListService.js # File d'attente prioritaire + cascade 
+├── utils/helpers.js # Échappement XSS + formatage 
+└── server.js # Point d'entrée HTTP natif
+
+
+## Prérequis
+
+- Node.js >= 18
+- PostgreSQL >= 14
+
+## Installation
+
+```bash
+git clone https://github.com/makhfi03/Sconnect-Pro.git
+cd Sconnect-Pro
+npm install
+cp .env.example .env
