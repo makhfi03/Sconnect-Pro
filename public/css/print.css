@@ -1,0 +1,49 @@
+@media print {
+  .navbar,
+  .btn,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  .card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    break-inside: avoid;
+  }
+
+  table {
+    border: 1px solid #333;
+  }
+
+  th {
+    background-color: #eee !important;
+    color: black;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  th, td {
+    border: 1px solid #999;
+  }
+
+  .badge {
+    border: 1px solid currentColor;
+  }
+
+  a {
+    text-decoration: none;
+    color: black;
+  }
+
+  .container {
+    max-width: 100%;
+    padding: 0;
+  }
+}
