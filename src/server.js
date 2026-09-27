@@ -59,7 +59,9 @@ router.get('/api/members/:id', MemberController.getById);
 router.post('/api/members', MemberController.create);
 router.put('/api/members/:id', MemberController.update);
 
+router.post('/api/registrations/quote', RegistrationController.quote);
 router.post('/api/registrations', RegistrationController.create);
+router.post('/api/registrations/:id/cancel', RegistrationController.cancel);
 
 const server = http.createServer(async (req, res) => {
   try {
